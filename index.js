@@ -8,18 +8,100 @@ const mongoose = require("mongoose");
 const uid2 = require("uid2");
 const SHA256 = require("crypto-js/sha256");
 const encBase64 = require("crypto-js/enc-base64");
-//
+const fileUpload = require("express-fileupload");
+const cloudinary = require("cloudinary").v2;
+const auth = require("./middlewares/auth");
+//config
 const app = express();
 app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
-mongoose.connect(process.env.MONGODB_URI);
+mongoose
+  .set("strictQuery", true)
+  .connect(process.env.MONGODB_URI || MONGODB_URI_SECONDARY);
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_APIKEY,
+  api_secret: process.env.CLOUDINARY_SECRETAPIKEY,
+});
+//fonctions
+const convertToBase64 = (file) => {
+  return `data:${file.mimetype};base64,${file.data.toString("base64")}`;
+};
 //import des models
 const User = require("./models/User");
-//Routes
-app.get("/", (req, res) => {
-  res.json({ message: "Ceci est la route / de l'API Chutes" });
+const Scrap = require("./models/Scrap");
+//ROUTES
+//Créer une offre
+app.post("/scrap/create", auth, fileUpload(), async (req, res) => {
+  console.log("get into route /scraps/create");
+
+  try {
+    const {
+      name,
+      condition,
+      description,
+      quantity,
+      price,
+      category,
+      homePickup,
+      material,
+      weight,
+      pictures,
+      color,
+      height,
+      length,
+      width,
+      thickness,
+      diameter,
+      depth,
+      shape,
+      necessaryTool,
+      normAndLabel,
+      brand,
+    } = req.body;
+    if (name) {
+      const newScrap = new Scrap({
+        name: name,
+        condition: condition,
+        quantity: quantity,
+        description: description,
+        price: price,
+        category: category,
+        homePickup: homePickup,
+        material: material,
+        weight: weight,
+        pictures: pictures,
+        color: color,
+        height: height,
+        length: length,
+        width: width,
+        thickness: thickness,
+        diameter: diameter,
+        depth: depth,
+        shape: shape,
+        necessaryTool: necessaryTool,
+        normAndLabel: normAndLabel,
+        brand: brand,
+        owner: req.user._id,
+      });
+      //   const pictureScrap = await cloudinary.uploader.upload(
+      //     convertToBase64(req.files.pictures)
+      //   );
+      //   newScrap.pictures = pictureScrap;
+
+      await newScrap.save();
+      res.json(newScrap);
+    }
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 });
+//Afficher toutes les offres
+app.get("/scraps", (req, res) => {
+  res.json({ message: "route: /scraps" });
+});
+//Inscription
 app.post("/scraps/signin", async (req, res) => {
   console.log("route : /scraps/signin");
   console.log(req.body);
@@ -41,19 +123,19 @@ app.post("/scraps/signin", async (req, res) => {
         const token = uid2(64);
         const salt = uid2(64);
         const hash = SHA256(password + salt).toString(encBase64);
-        const user = new User({
+        const newUser = new User({
           email: email,
           username: username,
           token: token,
           salt: salt,
           hash: hash,
         });
-        await user.save();
+        await newUser.save();
         res.json({
-          _id: user._id,
-          token: user.token,
-          username: user.username,
-          email: user.email,
+          _id: newUser._id,
+          token: newUser.token,
+          username: newUser.username,
+          email: newUser.email,
         });
       } else {
         res.json({ error: "Tous les champs doivent être remplis" });
@@ -71,5 +153,5 @@ app.all("*", function (req, res) {
 //
 const port = process.env.PORT || process.env.localPort;
 app.listen(port, () => {
-  console.log("Le serveur a demarré");
+  console.log(`Le serveur a demarré sur le port ${port} `);
 });
