@@ -31,7 +31,32 @@ const convertToBase64 = (file) => {
 //import des models
 const User = require("./models/User");
 const Scrap = require("./models/Scrap");
+//
 //ROUTES
+//Afficher les offres
+app.get("/scraps", async (req, res) => {
+  console.log("get into route /scraps");
+  try {
+    const allScraps = await Scrap.find();
+    console.log("allscraps ===> ", allScraps);
+    res.status(200).json(allScraps);
+    // res.status(200).json("coucou, ceci est la réponse du back /scraps");
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+//Afficher une offre
+app.get("/scrap/:id", async (req, res) => {
+  console.log("get into route /scrap/:id");
+  const idScrap = req.params.id;
+  try {
+    const result = await Scrap.findById(idScrap);
+    console.log("Result ===> ", result);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
 //Créer une offre
 app.post("/scrap/create", auth, fileUpload(), async (req, res) => {
   console.log("get into route /scraps/create");
@@ -97,10 +122,7 @@ app.post("/scrap/create", auth, fileUpload(), async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
-//Afficher toutes les offres
-app.get("/scraps", (req, res) => {
-  res.json({ message: "route: /scraps" });
-});
+
 //Inscription
 app.post("/scraps/signin", async (req, res) => {
   console.log("route : /scraps/signin");
@@ -151,7 +173,7 @@ app.all("*", function (req, res) {
   res.status(404).json({ message: "Page non trouvée" });
 });
 //
-const port = process.env.PORT || process.env.localPort;
-app.listen(port, () => {
-  console.log(`Le serveur a demarré sur le port ${port} `);
+// const port = process.env.PORT || process.env.localPort;
+app.listen(3000, () => {
+  console.log(`Le serveur a demarré sur le port 3000 `);
 });
