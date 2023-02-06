@@ -29,7 +29,7 @@ const Scrap = mongoose.model("Scrap", {
   pictures: { type: Array, required: false },
   homePickup: { type: Boolean, default: true, required: true },
   sending: { type: Boolean, default: false, required: false },
-  weight: { type: Number, required: true },
+  weight: { type: String, required: true },
   material: { type: [String], required: true },
   height: { type: Number, required: false },
   length: { type: Number, required: false },
