@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Scrap = mongoose.model("Scrap", {
-  name: { type: String, required: true },
+  name: { type: String, required: true, maxlength: 40 },
   condition: {
     type: String,
     required: true,
