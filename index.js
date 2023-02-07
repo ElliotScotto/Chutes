@@ -58,7 +58,7 @@ app.get("/scrap/:id", async (req, res) => {
   }
 });
 //Créer une offre
-app.post("/scrap/create", auth, fileUpload(), async (req, res) => {
+app.post("/scrap/create", fileUpload(), async (req, res) => {
   console.log("get into route /scraps/create");
 
   try {
@@ -70,10 +70,10 @@ app.post("/scrap/create", auth, fileUpload(), async (req, res) => {
       price,
       category,
       homePickup,
+      sending,
       material,
       weight,
       pictures,
-      color,
       height,
       length,
       width,
@@ -94,21 +94,21 @@ app.post("/scrap/create", auth, fileUpload(), async (req, res) => {
         price: price,
         category: category,
         homePickup: homePickup,
+        sending: sending,
         material: material,
         weight: weight,
-        pictures: pictures,
-        color: color,
-        height: height,
+        // pictures: pictures,
+        // height: height,
         length: length,
-        width: width,
-        thickness: thickness,
-        diameter: diameter,
-        depth: depth,
+        // width: width,
+        // thickness: thickness,
+        // diameter: diameter,
+        // depth: depth,
         shape: shape,
         necessaryTool: necessaryTool,
-        normAndLabel: normAndLabel,
-        brand: brand,
-        owner: req.user._id,
+        // normAndLabel: normAndLabel,
+        // brand: brand,
+        // owner: req.user._id,
       });
       //   const pictureScrap = await cloudinary.uploader.upload(
       //     convertToBase64(req.files.pictures)
