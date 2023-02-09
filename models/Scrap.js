@@ -11,7 +11,6 @@ const Scrap = mongoose.model("Scrap", {
   price: { type: Number, required: true },
   isFree: { type: Boolean, required: true },
   isForSell: { type: Boolean, required: true },
-  isForRent: { type: Boolean, required: true },
   category: {
     type: [String],
     required: true,
