@@ -9,6 +9,7 @@ const Scrap = mongoose.model("Scrap", {
   description: { type: String, minlength: 10, maxlength: 300, required: true },
   quantity: { type: Number, default: 1, required: true },
   price: { type: Number, required: true },
+  isForLend: { type: Boolean, default: false, required: false },
   category: {
     type: [String],
     required: true,
