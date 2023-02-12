@@ -87,6 +87,7 @@ app.post("/scrap/create", fileUpload(), async (req, res) => {
       normAndLabel,
       brand,
     } = req.body;
+    // const pictures = req.files.pictures;
     if (name) {
       const newScrap = new Scrap({
         name: name,
@@ -114,10 +115,6 @@ app.post("/scrap/create", fileUpload(), async (req, res) => {
         brand: brand,
         // owner: req.user._id,
       });
-      //   const pictureScrap = await cloudinary.uploader.upload(
-      //     convertToBase64(req.files.pictures)
-      //   );
-      //   newScrap.pictures = pictureScrap;
 
       await newScrap.save();
       res.json(newScrap);
@@ -126,7 +123,27 @@ app.post("/scrap/create", fileUpload(), async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
+//Créer une offre
+app.post("/scrap/upload", fileUpload(), async (req, res) => {
+  console.log("get into route /scraps/upload");
 
+  try {
+    const { pictures } = req.files;
+    if (pictures) {
+      const newScrap = new Scrap({
+        pictures: pictures,
+      });
+      const pictureScrap = await cloudinary.uploader.upload(
+        convertToBase64(req.files.pictures)
+      );
+      newScrap.pictures = pictureScrap;
+      await newScrap.save();
+      res.json(newScrap);
+    }
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
 //Inscription
 app.post("/scraps/signin", async (req, res) => {
   console.log("route : /scraps/signin");
