@@ -60,7 +60,6 @@ app.get("/scrap/:id", async (req, res) => {
 //Créer une offre
 app.post("/scrap/create", fileUpload(), async (req, res) => {
   console.log("get into route /scraps/create");
-
   try {
     const {
       name,
@@ -75,7 +74,6 @@ app.post("/scrap/create", fileUpload(), async (req, res) => {
       sending,
       material,
       weight,
-      pictures,
       height,
       length,
       width,
@@ -86,8 +84,9 @@ app.post("/scrap/create", fileUpload(), async (req, res) => {
       necessaryTool,
       normAndLabel,
       brand,
+      pictures,
     } = req.body;
-    // const pictures = req.files.pictures;
+
     if (name) {
       const newScrap = new Scrap({
         name: name,
@@ -102,7 +101,6 @@ app.post("/scrap/create", fileUpload(), async (req, res) => {
         sending: sending,
         material: material,
         weight: weight,
-        pictures: pictures,
         height: height,
         length: length,
         width: width,
@@ -123,25 +121,20 @@ app.post("/scrap/create", fileUpload(), async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 });
-//Créer une offre
+//Uploader une image
 app.post("/scrap/upload", fileUpload(), async (req, res) => {
   console.log("get into route /scraps/upload");
-
+  console.log("req.files.picture === >", req.files.picture);
   try {
-    const { pictures } = req.files;
-    if (pictures) {
-      const newScrap = new Scrap({
-        pictures: pictures,
-      });
-      const pictureScrap = await cloudinary.uploader.upload(
-        convertToBase64(req.files.pictures)
-      );
-      newScrap.pictures = pictureScrap;
-      await newScrap.save();
-      res.json(newScrap);
-    }
+    const pictureToUpload = req.files.picture;
+    // On envoie une à Cloudinary un buffer converti en base64
+    const result = await cloudinary.uploader.upload(
+      convertToBase64(pictureToUpload)
+    );
+    return res.json(result);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.log("Erreur du serveur Catch");
+    return res.json({ error: error.message });
   }
 });
 //Inscription
