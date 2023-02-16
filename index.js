@@ -11,8 +11,10 @@ const encBase64 = require("crypto-js/enc-base64");
 const fileUpload = require("express-fileupload");
 const cloudinary = require("cloudinary").v2;
 const auth = require("./middlewares/auth");
+
 //config
 const app = express();
+
 app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
@@ -36,9 +38,18 @@ const Scrap = require("./models/Scrap");
 //Afficher les offres
 app.get("/scraps", async (req, res) => {
   console.log("get into route /scraps");
+  //Destructuring
+  const { name, condition, description, category, page } = req.query;
+  //On crée un objet vide dans lequel tous les résultats des filtres selectionnées seront intégré.
+  const filters = {};
   try {
-    const allScraps = await Scrap.find();
-    console.log("allscraps ===> ", allScraps);
+    if (name) {
+      filters.name = new RegExp(name, "i");
+    }
+    // const allScraps affiche un objet remplit par les filtres selectionnés avec l'objet filters.
+    const allScraps = await Scrap.find(filters);
+    // const allScraps = await Scrap.find();
+    // console.log("allscraps ===> ", allScraps);
     res.status(200).json(allScraps);
     // res.status(200).json("coucou, ceci est la réponse du back /scraps");
   } catch (error) {
@@ -76,10 +87,25 @@ app.post("/scrap/create", fileUpload(), async (req, res) => {
       weight,
       height,
       length,
+      mmLength,
+      cmLength,
+      mLength,
       width,
+      mmWidth,
+      cmWidth,
+      mWidth,
       thickness,
+      mmThickness,
+      cmThickness,
+      mThickness,
       diameter,
+      mmDiameter,
+      cmDiameter,
+      mDiameter,
       depth,
+      mmDepth,
+      cmDepth,
+      mDepth,
       shape,
       necessaryTool,
       normAndLabel,
@@ -103,10 +129,25 @@ app.post("/scrap/create", fileUpload(), async (req, res) => {
         weight: weight,
         height: height,
         length: length,
+        mmLength: mmLength,
+        cmLength: cmLength,
+        mLength: mLength,
         width: width,
+        mmWidth: mmWidth,
+        cmWidth: cmWidth,
+        mWidth: mWidth,
         thickness: thickness,
+        mmThickness: mmThickness,
+        cmThickness: cmThickness,
+        mThickness: mThickness,
         diameter: diameter,
+        mmDiameter: mmDiameter,
+        cmDiameter: cmDiameter,
+        mDiameter: mDiameter,
         depth: depth,
+        mmDepth: mmDepth,
+        cmDepth: cmDepth,
+        mDepth: mDepth,
         shape: shape,
         necessaryTool: necessaryTool,
         normAndLabel: normAndLabel,

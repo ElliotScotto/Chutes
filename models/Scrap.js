@@ -34,11 +34,32 @@ const Scrap = mongoose.model("Scrap", {
   weight: { type: String, required: true },
   material: { type: [String], required: true },
   height: { type: Number, required: false },
+  //length
   length: { type: Number, required: false },
+  mmLength: { type: Boolean, required: false },
+  cmLength: { type: Boolean, required: false },
+  mLength: { type: Boolean, required: false },
+  //width
   width: { type: Number, required: false },
+  mmWidth: { type: Boolean, required: false },
+  cmWidth: { type: Boolean, required: false },
+  mWidth: { type: Boolean, required: false },
+  //thickness
   thickness: { type: Number, required: false },
+  mmThickness: { type: Boolean, required: false },
+  cmThickness: { type: Boolean, required: false },
+  mThickness: { type: Boolean, required: false },
+  //diameter
   diameter: { type: Number, required: false },
+  mmDiameter: { type: Boolean, required: false },
+  cmDiameter: { type: Boolean, required: false },
+  mDiameter: { type: Boolean, required: false },
+  //depth
   depth: { type: Number, required: false },
+  mmDepth: { type: Boolean, required: false },
+  cmDepth: { type: Boolean, required: false },
+  mlDepth: { type: Boolean, required: false },
+  //shape
   shape: {
     type: [String],
     required: false,
