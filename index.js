@@ -39,17 +39,35 @@ const Scrap = require("./models/Scrap");
 app.get("/scraps", async (req, res) => {
   console.log("get into route /scraps");
   //Destructuring
-  const { name, condition, description, category, page } = req.query;
-  //On crée un objet vide dans lequel tous les résultats des filtres selectionnées seront intégré.
-  const filters = {};
+  const filter = JSON.parse(req.query.filter);
+  //On crée un objet vide dans lequel tous les résultats des filtres selectionnées seront intégrés.
+  const query = {};
+  console.log("typeof filter ==== > ", typeof filter);
+  console.log(" filter ==== > ", filter);
   try {
-    if (name) {
-      filters.name = new RegExp(name, "i");
+    //Tri
+    //NAME
+    if (filter.search) {
+      query.name = { $regex: filter.search, $options: "i" };
     }
-    // const allScraps affiche un objet remplit par les filtres selectionnés avec l'objet filters.
-    const allScraps = await Scrap.find(filters);
-    // const allScraps = await Scrap.find();
-    // console.log("allscraps ===> ", allScraps);
+    //CONDITION
+    if (filter.perfect) {
+      query.condition = "Comme neuf";
+    }
+    if (filter.good) {
+      query.condition = "Très bon état";
+    }
+    if (filter.acceptable) {
+      query.condition = "Correct";
+    }
+    if (filter.damaged) {
+      query.condition = "Abîmé";
+    }
+    if (filter.ruined) {
+      query.condition = "Très abîmé";
+    }
+    //
+    const allScraps = await Scrap.find(query);
     res.status(200).json(allScraps);
     // res.status(200).json("coucou, ceci est la réponse du back /scraps");
   } catch (error) {
