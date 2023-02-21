@@ -38,38 +38,62 @@ const Scrap = require("./models/Scrap");
 //Afficher les offres
 app.get("/scraps", async (req, res) => {
   console.log("get into route /scraps");
-  //Destructuring
-  const filter = JSON.parse(req.query.filter);
+  // On commence par récupérer tous les scraps de la base de données
+  // let allScraps = await Scrap.find();
+  //On récupère un objet appelé filter côté client contenant condition et isFree.
+  const userFilters = JSON.parse(req.query.filter);
+  console.log("typeof userFilters ==== > ", typeof userFilters);
+  console.log(" userFilters ==== > ", userFilters);
   //On crée un objet vide dans lequel tous les résultats des filtres selectionnées seront intégrés.
-  const query = {};
-  console.log("typeof filter ==== > ", typeof filter);
-  console.log(" filter ==== > ", filter);
+  let filters = {};
+
   try {
     //Tri
     //NAME
-    if (filter.search) {
-      query.name = { $regex: filter.search, $options: "i" };
+    if (userFilters.search) {
+      filters.name = { $regex: userFilters.search, $options: "i" };
     }
     //CONDITION
-    if (filter.perfect) {
-      query.condition = "Comme neuf";
+    if (userFilters.perfect) {
+      filters.condition = "Comme neuf";
     }
-    if (filter.good) {
-      query.condition = "Très bon état";
+    if (userFilters.good) {
+      filters.condition = { $in: ["Comme neuf", "Très bon état"] };
     }
-    if (filter.acceptable) {
-      query.condition = "Correct";
+    if (userFilters.acceptable) {
+      filters.condition = { $in: ["Comme neuf", "Très bon état", "Correct"] };
     }
-    if (filter.damaged) {
-      query.condition = "Abîmé";
+    if (userFilters.damaged) {
+      filters.condition = {
+        $in: ["Comme neuf", "Très bon état", "Correct", "Abîmé"],
+      };
     }
-    if (filter.ruined) {
-      query.condition = "Très abîmé";
+    if (userFilters.ruined) {
+      filters.condition = {
+        $in: ["Comme neuf", "Très bon état", "Correct", "Abîmé", "Très abîmé"],
+      };
     }
-    //
-    const allScraps = await Scrap.find(query);
+
+    //PRICE
+    let priceSorted = {};
+    console.log("req.query.sort =====> ", req.query.sort);
+    if (req.query.sort === "price-asc") {
+      priceSorted = { price: 1 };
+    } else if (req.query.sort === "price-desc") {
+      priceSorted = { price: -1 };
+    }
+    //REPONSE
+
+    // if (userFilters.isAsc || userFilters.isDesc) {
+    //   allScraps = await Scrap.find(filters).sort(priceSorted);
+    // } else {
+    //   allScraps = await Scrap.find(filters);
+    // }
+
+    const allScraps = await Scrap.find(filters).sort(priceSorted);
+    // Nombre d'annonces trouvées en fonction des filtres
+    const count = await Scrap.countDocuments();
     res.status(200).json(allScraps);
-    // res.status(200).json("coucou, ceci est la réponse du back /scraps");
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -214,7 +238,7 @@ app.post("/scraps/signin", async (req, res) => {
         message: "Votre mot de passe doit comporter au moins 8 caractères",
       });
     } else {
-      if (email && password && username) {
+      if (email || password || username) {
         const token = uid2(64);
         const salt = uid2(64);
         const hash = SHA256(password + salt).toString(encBase64);
