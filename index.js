@@ -39,21 +39,19 @@ const Scrap = require("./models/Scrap");
 app.get("/scraps", async (req, res) => {
   console.log("get into route /scraps");
   // On commence par récupérer tous les scraps de la base de données
-  // let allScraps = await Scrap.find();
-  //On récupère un objet appelé filter côté client contenant condition et isFree.
-  const userFilters = JSON.parse(req.query.filter);
-  console.log("typeof userFilters ==== > ", typeof userFilters);
-  console.log(" userFilters ==== > ", userFilters);
+  let allScraps = await Scrap.find();
+  //On récupère un objet appelé filter côté client contenant "condition".
+  const userFilters = JSON.parse(req.query.filter); //userFilters est un objet
+  console.log(" userFilters ==== > ", userFilters); //contient Condition, Search, freeScraps
   //On crée un objet vide dans lequel tous les résultats des filtres selectionnées seront intégrés.
   let filters = {};
-
   try {
-    //Tri
-    //NAME
+    //Tri :
+    //1 NAME
     if (userFilters.search) {
       filters.name = { $regex: userFilters.search, $options: "i" };
     }
-    //CONDITION
+    //2 CONDITION
     console.log("userFilters.condition =====> ", userFilters.condition);
     console.log(
       "userFilters.condition.perfect =====> ",
@@ -76,14 +74,17 @@ app.get("/scraps", async (req, res) => {
       };
     }
 
-    //PRICE
+    //3 PRICE
+    //Gratuit ou non
     const freeScrap = userFilters.freeScrap;
     console.log("freeScrap ==== > ", freeScrap);
     if (freeScrap) {
       filters = freeScrap && { $or: [{ isFree: true }, { price: 0 }] };
     }
+    //Tri  Croissant ou décroissant
     let priceSorted = {};
     console.log("req.query.sort =====> ", req.query.sort);
+
     if (req.query.sort === "price-asc") {
       priceSorted = { price: 1 };
     }
@@ -91,17 +92,14 @@ app.get("/scraps", async (req, res) => {
       priceSorted = { price: -1 };
     }
     //REPONSE
-
-    // if (userFilters.isAsc || userFilters.isDesc) {
-    //   allScraps = await Scrap.find(filters).sort(priceSorted);
-    // } else {
-    //   allScraps = await Scrap.find(filters);
-    // }
-
-    const allScraps = await Scrap.find(filters).sort(priceSorted);
+    if (req.query.sort) {
+      allScraps = await Scrap.find(filters).sort(priceSorted);
+    } else {
+      allScraps = await Scrap.find(filters);
+    }
     // Nombre d'annonces trouvées en fonction des filtres
-    const count = await Scrap.countDocuments();
-    res.status(200).json(allScraps);
+    const count = await Scrap.countDocuments(filters);
+    res.status(200).json({ count, allScraps });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
