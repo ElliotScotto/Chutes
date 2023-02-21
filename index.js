@@ -54,32 +54,40 @@ app.get("/scraps", async (req, res) => {
       filters.name = { $regex: userFilters.search, $options: "i" };
     }
     //CONDITION
+    console.log("userFilters.condition =====> ", userFilters.condition);
+    console.log(
+      "userFilters.condition.perfect =====> ",
+      userFilters.condition.perfect
+    );
+    const conditions = userFilters.condition;
     if (userFilters.perfect) {
       filters.condition = "Comme neuf";
-    }
-    if (userFilters.good) {
+    } else if (userFilters.good) {
       filters.condition = { $in: ["Comme neuf", "Très bon état"] };
-    }
-    if (userFilters.acceptable) {
+    } else if (userFilters.acceptable) {
       filters.condition = { $in: ["Comme neuf", "Très bon état", "Correct"] };
-    }
-    if (userFilters.damaged) {
+    } else if (userFilters.damaged) {
       filters.condition = {
         $in: ["Comme neuf", "Très bon état", "Correct", "Abîmé"],
       };
-    }
-    if (userFilters.ruined) {
+    } else if (userFilters.ruined) {
       filters.condition = {
         $in: ["Comme neuf", "Très bon état", "Correct", "Abîmé", "Très abîmé"],
       };
     }
 
     //PRICE
+    const freeScrap = userFilters.freeScrap;
+    console.log("freeScrap ==== > ", freeScrap);
+    if (freeScrap) {
+      filters = freeScrap && { $or: [{ isFree: true }, { price: 0 }] };
+    }
     let priceSorted = {};
     console.log("req.query.sort =====> ", req.query.sort);
     if (req.query.sort === "price-asc") {
       priceSorted = { price: 1 };
-    } else if (req.query.sort === "price-desc") {
+    }
+    if (req.query.sort === "price-desc") {
       priceSorted = { price: -1 };
     }
     //REPONSE
