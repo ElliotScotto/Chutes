@@ -49,7 +49,10 @@ app.get("/scraps", async (req, res) => {
     //Tri :
     //1 NAME
     if (userFilters.search) {
-      filters.name = { $regex: userFilters.search, $options: "i" };
+      filters.$or = [
+        { name: { $regex: userFilters.search, $options: "i" } },
+        { description: { $regex: userFilters.search, $options: "i" } },
+      ];
     }
     //2 CONDITION
     // console.log("userFilters.condition =====> ", userFilters.condition);
