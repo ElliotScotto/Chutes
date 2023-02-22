@@ -52,29 +52,74 @@ app.get("/scraps", async (req, res) => {
       filters.name = { $regex: userFilters.search, $options: "i" };
     }
     //2 CONDITION
-    console.log("userFilters.condition =====> ", userFilters.condition);
-    console.log(
-      "userFilters.condition.perfect =====> ",
-      userFilters.condition.perfect
-    );
-    const conditions = userFilters.condition;
+    // console.log("userFilters.condition =====> ", userFilters.condition);
+    const userConditions = [];
+    // Vérifier les options sélectionnées par l'utilisateur
     if (userFilters.perfect) {
-      filters.condition = "Comme neuf";
-    } else if (userFilters.good) {
-      filters.condition = { $in: ["Comme neuf", "Très bon état"] };
-    } else if (userFilters.acceptable) {
-      filters.condition = { $in: ["Comme neuf", "Très bon état", "Correct"] };
-    } else if (userFilters.damaged) {
-      filters.condition = {
-        $in: ["Comme neuf", "Très bon état", "Correct", "Abîmé"],
-      };
-    } else if (userFilters.ruined) {
-      filters.condition = {
-        $in: ["Comme neuf", "Très bon état", "Correct", "Abîmé", "Très abîmé"],
-      };
+      userConditions.push("Comme neuf");
+    }
+    if (userFilters.good) {
+      userConditions.push("Très bon état");
+    }
+    if (userFilters.acceptable) {
+      userConditions.push("Correct");
+    }
+    if (userFilters.damaged) {
+      userConditions.push("Abîmé");
+    }
+    if (userFilters.ruined) {
+      userConditions.push("Très abîmé");
     }
 
-    //3 PRICE
+    // Filtrer les produits en fonction des options sélectionnées
+    if (userConditions.length > 0) {
+      filters.condition = { $in: userConditions };
+      console.log("userConditions ====> ", userConditions);
+    }
+    //2 CONDITION
+    // console.log("userFilters.category =====> ", userFilters.category);
+    const userCategory = [];
+    // Vérifier les options sélectionnées par l'utilisateur
+    if (userFilters.quincaillerie) {
+      userCategory.push("Quincaillerie");
+    }
+    if (userFilters.outils) {
+      userCategory.push("Outils");
+    }
+    if (userFilters.peinture) {
+      userCategory.push("Peinture");
+    }
+    if (userFilters.sol) {
+      userCategory.push("Sol");
+    }
+    if (userFilters.electricite) {
+      userCategory.push("Electricité");
+    }
+    if (userFilters.plomberie) {
+      userCategory.push("Plomberie");
+    }
+    if (userFilters.toiture) {
+      userCategory.push("Toiture");
+    }
+    if (userFilters.menuiserie) {
+      userCategory.push("Menuiserie");
+    }
+    if (userFilters.grosOeuvre) {
+      userCategory.push("Gros-Oeuvre");
+    }
+    if (userFilters.jardin) {
+      userCategory.push("Jardin");
+    }
+    if (userFilters.divers) {
+      userCategory.push("Divers");
+    }
+
+    // Filtrer les produits en fonction des options sélectionnées
+    if (userCategory.length > 0) {
+      filters.category = { $in: userCategory };
+      console.log("userCategory ====> ", userCategory);
+    }
+    //4 PRICE
     //Gratuit ou non
     const freeScrap = userFilters.freeScrap;
     console.log("freeScrap ==== > ", freeScrap);
